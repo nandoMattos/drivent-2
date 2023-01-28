@@ -3,6 +3,19 @@ import ticketsService from "@/services/tickets-service";
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 
+export async function postTicket(req: AuthenticatedRequest, res: Response) {
+  try{
+    const ticketTypeId = req.body.ticketTypeId as number;
+    const { userId } = req;
+    const createdTicket = await ticketsService.insertTicket(ticketTypeId, userId);
+    res.status(201).send(createdTicket);
+  }catch(err) {
+    if(err.name === "NotFoundError") {
+      res.sendStatus(httpStatus.NOT_FOUND);
+    }
+  }
+}
+
 export async function getUserTickets(req: AuthenticatedRequest, res: Response) {
   try{
     const { userId } = req;
