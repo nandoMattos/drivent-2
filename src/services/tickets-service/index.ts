@@ -1,10 +1,7 @@
-import { notFoundError } from "@/errors";
 import ticketsRepository from "@/repositories/ticket-repository";
 
 async function getAllTicketTypes() {
-  const ticketTypes = await ticketsRepository.findMany();
-  if(!ticketTypes) throw notFoundError();
-  return ticketTypes;
+  return await ticketsRepository.findMany();
 }
 
 const ticketsService = {
