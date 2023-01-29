@@ -1,6 +1,6 @@
 import { AddressEnrollment } from "@/protocols";
 import { getAddress } from "@/utils/cep-service";
-import { notFoundError } from "@/errors";
+import { notFoundError, unauthorizedError } from "@/errors";
 import addressRepository, { CreateAddressParams } from "@/repositories/address-repository";
 import enrollmentRepository, { CreateEnrollmentParams } from "@/repositories/enrollment-repository";
 import { exclude } from "@/utils/prisma-utils";
@@ -81,10 +81,23 @@ export type CreateOrUpdateEnrollmentWithAddress = CreateEnrollmentParams & {
   address: CreateAddressParams;
 };
 
+async function ticketBelongsToUser(userId: number, ticketId: number) {
+  const enrollment = await enrollmentRepository.
+    findEnrollmentConnectedWithUserAndTicket(
+      userId, 
+      ticketId
+    );
+
+  if(enrollment.Ticket.length === 0) {
+    throw unauthorizedError();
+  }
+} 
+
 const enrollmentsService = {
   getOneWithAddressByUserId,
   createOrUpdateEnrollmentWithAddress,
-  getAddressFromCEP
+  getAddressFromCEP,
+  ticketBelongsToUser
 };
 
 export default enrollmentsService;
