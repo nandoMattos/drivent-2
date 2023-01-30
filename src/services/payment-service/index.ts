@@ -31,8 +31,20 @@ async function processPayment(userId: number, payment: PaymentBody) {
   return paymentDone;
 }
 
+async function getUserPayment(userId: number, ticketId: number) {
+  const ticketExists = await ticketsRepository.findById(ticketId);
+  if(!ticketExists) {
+    throw notFoundError();
+  }
+
+  await enrollmentsService.ticketBelongsToUser(userId, ticketExists.id);
+
+  return await paymentRepository.findOneByTicketId(ticketExists.id);
+}
+
 const paymentService = {
   processPayment,
+  getUserPayment,
 };
 
 export default paymentService;
